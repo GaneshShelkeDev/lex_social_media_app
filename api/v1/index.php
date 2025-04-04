@@ -2,7 +2,7 @@
 
 /**
  * ========================================================================================
- * Bible App APIs Version 1.0.0
+ * Lex Social Media App APIs Version 1.0.0
  * Developed by Ganesh Shelke -  Allied Technologies, 2025.
  * ========================================================================================
  * REST API main endpoint
@@ -12,19 +12,44 @@
  * =========================================================================================
  */
 
-ini_set("display_errors",1);
-
- /**adding prerequisite files */
-session_start();
-$contentType = isset($_SERVER["CONTENT_TYPE"]) ? $_SERVER["CONTENT_TYPE"] : '';
-if (strpos($contentType, 'application/json') !== false) {
-    $_POST = json_decode(file_get_contents('php://input'), true);
-}
-require "app/config/database.php";
-require "app/config/config.php";
-// require "../app/controllers/functions.php";
-
-header('Content-Type: application/json; charset=utf-8');
+ ini_set("display_errors", 1);
+ session_start();
+ 
+ // Set common headers
+ header('Content-Type: application/json; charset=utf-8');
+ header('Access-Control-Allow-Origin: *');
+ header('Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE');
+ header('Access-Control-Allow-Headers: Content-Type, Authorization');
+ 
+ // Handle JSON input
+ $json = file_get_contents('php://input');
+ $_POST = json_decode($json, true);
+ 
+ if (json_last_error() !== JSON_ERROR_NONE) {
+     http_response_code(400);
+     echo json_encode(["status" => "error", "message" => "Invalid JSON format"]);
+     exit;
+ }
+ 
+ // Include required files
+ require "app/config/database.php";
+ require "app/config/config.php";
+ require "app/controllers/functions.php";
+ 
+ // Check database connection
+ if (!isset($connect)) {
+     http_response_code(500);
+     echo json_encode(["status" => "error", "message" => "Database connection not established"]);
+     exit;
+ }
+ 
+ // Check for required request parameter
+ if (!isset($_POST["request"]) || empty($_POST["request"])) {
+     http_response_code(400);
+     echo json_encode(["status" => "error", "message" => "Required parameter 'request' is missing"]);
+     exit;
+ }
+ 
 
 $response["response"] = array();
 $data = array();
