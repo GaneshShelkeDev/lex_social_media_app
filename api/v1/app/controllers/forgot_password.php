@@ -13,7 +13,6 @@ if (empty($_POST['email'])) {
 
 $email = mysqli_real_escape_string($connect, $_POST["email"]);
 $otp = sprintf("%04d", random_int(0, 9999)); // Generate 4-digit OTP
-$expiry = time() + (60 * 15); // OTP valid for 15 minutes
 
 $token_sql = "SELECT id FROM users WHERE email = ?";
 $stmt = mysqli_prepare($connect, $token_sql);

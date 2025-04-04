@@ -22,14 +22,21 @@
  header('Access-Control-Allow-Headers: Content-Type, Authorization');
  
  // Handle JSON input
- $json = file_get_contents('php://input');
- $_POST = json_decode($json, true);
- 
- if (json_last_error() !== JSON_ERROR_NONE) {
-     http_response_code(400);
-     echo json_encode(["status" => "error", "message" => "Invalid JSON format"]);
-     exit;
- }
+ if (
+    isset($_SERVER['CONTENT_TYPE']) &&
+    strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false
+) {
+    $json = file_get_contents('php://input');
+    $_POST = json_decode($json, true);
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        http_response_code(400);
+        echo json_encode(["status" => "error", "message" => "Invalid JSON format"]);
+        exit;
+    }
+}
+// Else, $_POST and $_FILES are already set correctly for form-data
+
  
  // Include required files
  require "app/config/database.php";
@@ -44,11 +51,12 @@
  }
  
  // Check for required request parameter
- if (!isset($_POST["request"]) || empty($_POST["request"])) {
+ if ((!isset($_POST["request"]) || empty($_POST["request"])) && (!isset($_REQUEST["request"]) || empty($_REQUEST["request"]))) {
      http_response_code(400);
      echo json_encode(["status" => "error", "message" => "Required parameter 'request' is missing"]);
      exit;
  }
+ $_POST["request"] = $_POST["request"] ?? $_REQUEST["request"];
  
 
 $response["response"] = array();
