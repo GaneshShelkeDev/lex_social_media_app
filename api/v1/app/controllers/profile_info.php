@@ -23,7 +23,7 @@ $profile = $_FILES['profile'] ?? null;
 
 // Handle file upload
 if ($profile) {
-    $target_dir = "uploads/profile_images/";
+    $target_dir = "app/uploads/profile_images/";
     if (!file_exists($target_dir)) {
         mkdir($target_dir, 0777, true);
     }
